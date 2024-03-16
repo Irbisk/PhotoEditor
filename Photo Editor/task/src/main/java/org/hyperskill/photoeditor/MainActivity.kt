@@ -15,6 +15,8 @@ import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.drawToBitmap
 import com.google.android.material.slider.Slider
 
 
@@ -27,7 +29,7 @@ class MainActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val photoUri = result.data?.data ?: return@registerForActivityResult
                 currentImage.setImageURI(photoUri)
-                defaultImage = drawableToBitmap(currentImage.drawable)
+                defaultImage = currentImage.drawable.toBitmap()
             }
         }
 
@@ -46,25 +48,25 @@ class MainActivity : AppCompatActivity() {
 
         //do not change this line
         currentImage.setImageBitmap(createBitmap())
-        defaultImage = drawableToBitmap(currentImage.drawable)
+        defaultImage = currentImage.drawable.toBitmap()
         galleryBtn.setOnClickListener {
             activityResultLauncher.launch(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
         }
 
 
 
-        brightnessSlider.addOnChangeListener { slider, value, fromUser ->
+        brightnessSlider.addOnChangeListener { _, value, _ ->
             val bitmap = defaultImage.copy(Bitmap.Config.ARGB_8888, true)
             for (x in 0 until bitmap.width) {
                 for (y in 0 until bitmap.height) {
                     val pixel = bitmap.getPixel(x, y)
 
                     val alpha = Color.alpha(pixel)
-                    val red = Color.red(pixel)
-                    val green = Color.green(pixel)
-                    val blue = Color.blue(pixel)
+                    val red = getRightColor(Color.red(pixel), value)
+                    val green = getRightColor(Color.green(pixel), value)
+                    val blue = getRightColor(Color.blue(pixel), value)
 
-                    val colorNew = Color.argb(alpha, getRightColor(red, value), getRightColor(green, value), getRightColor(blue, value))
+                    val colorNew = Color.argb(alpha, red, green, blue)
                     bitmap.setPixel(x, y, colorNew)
                 }
             }
