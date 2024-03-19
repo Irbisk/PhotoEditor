@@ -21,14 +21,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Gallery"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/btnSave"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivPhoto" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
@@ -50,11 +49,11 @@
         android:valueFrom="-250"
         android:valueTo="250"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintStart_toEndOf="@+id/tvBright"
         app:layout_constraintTop_toBottomOf="@+id/btnGallery" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tvBright"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -62,6 +61,81 @@
         app:layout_constraintBottom_toBottomOf="@+id/slBrightness"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/slBrightness" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slContrast"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:stepSize="10"
+        android:value="0"
+        android:valueFrom="-250"
+        android:valueTo="250"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvBright"
+        app:layout_constraintTop_toBottomOf="@+id/slBrightness" />
+
+    <TextView
+        android:id="@+id/tvContrast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="contrast"
+        app:layout_constraintBottom_toBottomOf="@+id/slContrast"
+        app:layout_constraintEnd_toStartOf="@+id/slContrast"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/slContrast" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slSaturation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:stepSize="10"
+        android:value="0"
+        android:valueFrom="-250"
+        android:valueTo="250"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvBright"
+        app:layout_constraintTop_toBottomOf="@+id/slContrast" />
+
+    <TextView
+        android:id="@+id/tvSaturation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="saturation"
+        app:layout_constraintBottom_toBottomOf="@+id/slSaturation"
+        app:layout_constraintEnd_toStartOf="@+id/slSaturation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/slSaturation" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slGamma"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:stepSize="0.2"
+        android:value="1"
+        android:valueFrom="0.2"
+        android:valueTo="4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvBright"
+        app:layout_constraintTop_toBottomOf="@+id/slSaturation" />
+
+    <TextView
+        android:id="@+id/tvGamma"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="gamma"
+        app:layout_constraintBottom_toBottomOf="@+id/slGamma"
+        app:layout_constraintEnd_toStartOf="@+id/slGamma"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/slGamma" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,6 +26,7 @@
             <stringArg name="classpath">
               <args>
                 <arg>$MODULE_DIR$/../../../../Photo Editor/task/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/R.jar</arg>
+                <arg>$MODULE_DIR$/../../../../Photo Editor/task/build/intermediates/compile_app_classes_jar/debug/classes.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/d416a9605d4931b8efcde51430fc533a/transformed/jetified-viewbinding-7.4.0-api.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/4d30ec8cbb6de78ce562a2c300d47981/transformed/jetified-robolectric-4.7.3.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/62d31d08c7aac93e979c4659e093a5a1/transformed/jetified-shadows-framework-4.7.3.jar</arg>

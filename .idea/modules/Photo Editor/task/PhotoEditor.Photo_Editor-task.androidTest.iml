@@ -14,6 +14,7 @@
           <stringArguments>
             <stringArg name="classpath">
               <args>
+                <arg>$MODULE_DIR$/../../../../Photo Editor/task/build/intermediates/compile_app_classes_jar/debug/classes.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/d416a9605d4931b8efcde51430fc533a/transformed/jetified-viewbinding-7.4.0-api.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/914570b27c5ecb490267e11549baf177/transformed/jetified-kotlin-stdlib-jdk8-1.6.10.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/306738935e408c4a0f2717c9abd83297/transformed/jetified-core-ktx-1.6.0-api.jar</arg>
