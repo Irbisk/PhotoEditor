@@ -1,0 +1,18 @@
+type: choice
+is_multiple_choice: true
+options:
+  - text: When one of the siblings fails with an exception
+  - text: When the parent coroutine gets cancelled
+  - text: When the parent coroutine is waiting for a child for more than MAX_DELAY
+  - text: When the parent fails with an exception
+files:
+  - name: src/main/Main.kt
+    visible: true
+    text: |+
+      // You can experiment here, it won’t be checked
+    
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/18893#comment
+status: Solved
+record: -1
+local_check: false

@@ -1,0 +1,17 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      fun validateConnection() {
+          connectToServer() // suspending function that doen't compile now
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/13754#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Sat, 23 Mar 2024 14:59:27 UTC"
+record: -1
+submission_language: kotlin

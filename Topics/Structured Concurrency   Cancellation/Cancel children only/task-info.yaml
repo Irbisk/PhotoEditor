@@ -1,0 +1,26 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      private suspend fun CoroutineScope.loadScreen() {
+          // launch pre-caching in background
+          launch { preCache("image_3") }
+          // load primary data
+          loadImage("image_1")
+          loadImage("image_2")
+      }
+      
+      // this function will be called right after pre-caching starts
+      private fun stopLoading(scope: CoroutineScope) {
+          // insert code here
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/18897#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Mon, 25 Mar 2024 11:43:00 UTC"
+record: -1
+submission_language: kotlin

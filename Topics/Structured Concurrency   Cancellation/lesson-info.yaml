@@ -1,0 +1,12 @@
+custom_name: Structured Concurrency & Cancellation
+content:
+  - Theory
+  - Scoped cancellation
+  - Children cancellation
+  - Cancel children only
+  - Supervisor job
+  - Connecting
+  - Supervise children
+  - Working with a lifecycle
+  - Launch all in one scope
+  - Difference between types of scopes

@@ -1,0 +1,24 @@
+<h2>Suspend!</h2>
+<div class="step-text">
+<p>Select all the places where we can call a suspending function.</p>
+<pre><code class="language-kotlin">fun printMyName() {
+    // 1
+}
+
+suspend fun loadInfo() {
+    // 2
+}
+
+fun main() {
+    // 3
+    
+    runBlocking { 
+        // 4
+    }
+
+    GlobalScope.launch {
+        // 5
+    }
+}
+</code></pre>
+</div>

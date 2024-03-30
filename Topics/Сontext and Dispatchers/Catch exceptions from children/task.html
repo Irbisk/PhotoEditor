@@ -1,0 +1,11 @@
+<h2>Catch exceptions from children</h2>
+<div class="step-text">
+<p></p>
+<p>This time, we're loading data of two types. One of those may not be important, so we want to know if something went wrong but don't want to the whole application to fail when the loading fails.</p>
+<p>Your job is to define the proper coroutines context, which will:</p>
+<ul>
+<li>prevent exceptions in any children job from propagating up and crashing the app;</li>
+<li>print any exception's message to console in a separate line (use the `.message` property of an exception).</li>
+</ul>
+<p><b>Tip:</b> You'll need more than one element in the context to stop exception propagation and to print the exceptions.</p><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br>
+</div>

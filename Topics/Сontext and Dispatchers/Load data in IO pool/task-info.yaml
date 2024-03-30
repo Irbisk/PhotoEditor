@@ -1,0 +1,23 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      fun main() = runBlocking(Dispatchers.Default) {
+          println("Started in " + coroutineContext[CoroutineDispatcher])
+      
+          // `loadData()` function is already defined for you
+          // make it run in an appropriate thread pool here
+          // don't modify the prints
+      
+          println("Finished in " + coroutineContext[CoroutineDispatcher])
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/20505#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Fri, 29 Mar 2024 14:09:55 UTC"
+record: -1
+submission_language: kotlin

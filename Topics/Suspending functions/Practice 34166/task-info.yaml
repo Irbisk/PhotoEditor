@@ -1,0 +1,24 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      suspend fun bakeCake() {
+          println("I'm a cyber baker. I'm starting to bake fast!")
+          delaySeconds(5)
+          println("The cake is ready!")
+      }
+      
+      // Please change only the "main" function:
+      fun main() {
+      
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/13728#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Fri, 22 Mar 2024 09:28:00 UTC"
+record: -1
+submission_language: kotlin

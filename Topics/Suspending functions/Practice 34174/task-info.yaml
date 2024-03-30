@@ -1,0 +1,28 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      suspend fun walk(meters: Double) {
+          println("Walking $meters meters. Feel free to dream about something!")
+          delaySeconds(meters.toLong())
+      }
+      
+      suspend fun waitInQueue() {
+          println("Staying in the queue. Feel free to dream about something!")
+          waitForTurn()
+      }
+      
+      // Please change only the "main" function:
+      fun main() {
+      
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/13730#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Fri, 22 Mar 2024 09:30:26 UTC"
+record: -1
+submission_language: kotlin

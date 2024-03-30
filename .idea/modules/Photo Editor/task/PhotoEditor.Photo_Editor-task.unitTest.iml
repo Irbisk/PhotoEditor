@@ -100,7 +100,9 @@
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/e473115d2e9208890344a80e3842dc8f/transformed/jetified-junit-4.13.2.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/3c87fe28e21bb53718e16702fec9b0fb/transformed/jetified-hamcrest-core-1.3.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/914570b27c5ecb490267e11549baf177/transformed/jetified-kotlin-stdlib-jdk8-1.6.10.jar</arg>
+                <arg>$USER_HOME$/.gradle/caches/transforms-3/fbda1415091f2fcf481cc4daa07f7479/transformed/jetified-kotlinx-coroutines-android-1.3.9.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/dfda3e1c00e1d7786ae055cfced30777/transformed/jetified-kotlin-stdlib-jdk7-1.6.10.jar</arg>
+                <arg>$USER_HOME$/.gradle/caches/transforms-3/efa58012a6b4e82de5789d9bb6c05181/transformed/jetified-kotlinx-coroutines-core-jvm-1.3.9.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/734c5699fa006b35decfd339e686794c/transformed/jetified-kotlin-stdlib-1.6.10.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/bfb24d772ac3b37b1e438d472b58087a/transformed/jetified-annotations-13.0.jar</arg>
                 <arg>$USER_HOME$/.gradle/caches/transforms-3/eb5b2e163f2f962f67b6f009277a9d9c/transformed/jetified-kotlin-stdlib-common-1.6.10.jar</arg>
@@ -187,6 +189,8 @@
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.lifecycle:lifecycle-common:2.3.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.arch.core:core-common:2.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.collection:collection:1.1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.3.9" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.robolectric:robolectric:4.7.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.robolectric:annotations:4.7.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.robolectric:junit:4.7.3" level="project" />

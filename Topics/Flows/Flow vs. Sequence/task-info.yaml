@@ -1,0 +1,18 @@
+type: choice
+is_multiple_choice: false
+options:
+  - text: Sequence builder generates all items at once
+  - text: Flow builder generates items in parallel
+  - text: Sequence works faster in simpler scenarios
+  - text: Flow builder can use suspending functions
+files:
+  - name: src/main/Main.kt
+    visible: true
+    text: |+
+      // You can experiment here, it won’t be checked
+    
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/24434#comment
+status: Solved
+record: -1
+local_check: false

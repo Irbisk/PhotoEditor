@@ -1,0 +1,18 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      // change this function:
+      fun logImageLoading(url: String): Image {
+      
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/13729#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Fri, 22 Mar 2024 09:19:37 UTC"
+record: -1
+submission_language: kotlin

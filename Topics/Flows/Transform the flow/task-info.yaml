@@ -1,0 +1,16 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      // transform given intFlow into a new one according to the task
+      val flow = intFlow
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/24443#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Fri, 29 Mar 2024 16:11:26 UTC"
+record: -1
+submission_language: kotlin

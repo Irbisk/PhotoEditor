@@ -1,0 +1,4 @@
+<h2>Load data in IO pool</h2>
+<div class="step-text">
+<p></p><p>We have an API for loading data from a server, and our app needs to wait for complete loading. However, since we may need a graphical UI, we can't do the loading in the main thread, as that may hang the window. Thus, we need to suspend and move the loading to the IO Dispatcher.</p><p>Your task is to execute the <code class="java">loadData()</code> function so that the app doesn't quit before it's done and all the loading happens in the IO thread.</p><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br>
+</div>

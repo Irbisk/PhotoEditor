@@ -1,0 +1,24 @@
+type: code
+custom_name: Connecting...
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      suspend fun workingWithDb(): Unit = coroutineScope {
+          val timeInMillis = measureTimeMillis {
+              // write your code here
+          }
+      
+          if (timeInMillis > 100) {
+              // write your code here
+          }
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/21756#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Mon, 25 Mar 2024 13:09:05 UTC"
+record: -1
+submission_language: kotlin

@@ -1,0 +1,18 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: "// Define a proper scope here\n// Don't ignore the error only log them\n\
+    // val mainScope = \n\nsuspend fun main() {\n    // we load data in the main scope\n\
+    \    // make the scope log errors thrown by `loadData`\n    // no need to modify\
+    \ this code\n    mainScope.loadData(\"http://url1\").join()\n    mainScope.loadData(\"\
+    http://url2\").join()\n}"
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/20506#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Fri, 29 Mar 2024 14:15:52 UTC"
+record: -1
+submission_language: kotlin

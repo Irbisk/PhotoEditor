@@ -1,0 +1,25 @@
+type: table
+files:
+  - name: src/main/Main.kt
+    visible: true
+    text: |+
+      // You can experiment here, it won’t be checked
+    
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/21755#comment
+status: Solved
+record: -1
+rows:
+  - "If a child fails, it will affect the parent"
+  - The launch coroutine builder returns a <code>Job</code> object
+  - We can use <code>join()</code> to wait for a job to finish
+columns:
+  - coroutineScope
+  - supervisorScope
+selected:
+  - - false
+    - false
+  - - false
+    - false
+  - - false
+    - false

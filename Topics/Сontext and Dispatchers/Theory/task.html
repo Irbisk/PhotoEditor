@@ -1,0 +1,112 @@
+<h2>Сontext and Dispatchers</h2>
+<div class="step-text">
+<p>We've worked with <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html">CoroutineScopes</a> in the previous article to control the work of children tasks. You may have noticed that passing additional parameters to the scope builder changes its behavior. We've seen how to change the error propagation by passing <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-supervisor-job.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-supervisor-job.html">SupervisorJob</a> to the scope builder. What else can we do? Let's take a look at some solutions.</p>
+<h5 id="context">Context</h5>
+<p>The <code class="language-kotlin">CoroutineScope</code> interface has only one property – <code class="language-kotlin">coroutineContext</code>, which contains all the information the coroutine needs for execution. It's similar to a <a href="https://en.wikipedia.org/wiki/Associative_array" rel="noopener noreferrer nofollow" target="_blank" title="https://en.wikipedia.org/wiki/Associative_array">map or dictionary</a> — all the values are stored there along with their keys. If we take our previous example with a supervised scope, we can see what's inside the context.</p>
+<pre><code class="language-kotlin">fun main() {
+    val supervisedScope = CoroutineScope(SupervisorJob())
+
+    println(supervisedScope)
+}</code></pre>
+<p>It will print something like <code class="language-kotlin">CoroutineScope(coroutineContext=SupervisorJobImpl{Active}@4534b60d)</code>. In our case, the context contains only one value — the job, which we can access using the <code class="language-kotlin">Job</code> interface's companion Key like that: <code class="language-kotlin">supervisedScope.coroutineContext[Job]</code>. We can add more things to the context – for example, an error handler:</p>
+<pre><code class="language-kotlin">val handler = CoroutineExceptionHandler { _, exception -&gt;
+    println("Caught ${exception.message}")
+}
+
+fun main() {
+    val supervisedScope = CoroutineScope(SupervisorJob() + handler)
+
+    println(supervisedScope)
+}</code></pre>
+<p>The output will look like this: <code class="language-kotlin">CoroutineScope(coroutineContext=[SupervisorJobImpl{Active}@7e32c033, MainKt$special$$inlined$CoroutineExceptionHandler$1@7ab2bfe1])</code>. Now we have two elements in the context. But what's the handler and what else can we put there?</p>
+<h5 id="jobs-exceptionhandlers-dispatchers">Jobs, ExceptionHandlers, Dispatchers</h5>
+<p>The most important elements we can add to the context are <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html">Job</a>, <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-exception-handler/index.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-exception-handler/index.html">ExceptionHandler</a>, and <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/index.html">Dispatcher</a> (the list is not exhaustive).</p>
+<ul>
+<li><strong>Job</strong> represents the work itself, including the hierarchy of children jobs. It has a state (Active/Completed/Cancelled) and defines how a failure or cancellation propagates to parent and children jobs.</li>
+<li><strong>ExceptionHandler</strong> handles uncaught exceptions in a coroutine or its children. It can be very helpful for logging, but note that it doesn't provide a way to catch the exception, so it cannot be used to recover from failures – we have <code class="language-kotlin">try/catch</code> for that. Also, <a href="https://kotlinlang.org/docs/exception-handling.html#coroutineexceptionhandler" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlinlang.org/docs/exception-handling.html#coroutineexceptionhandler">it has to be installed on the root</a> coroutine only, because children automatically propagate uncaught errors to the parent all the way up to the root.</li>
+<li><strong>Dispatcher</strong> defines which thread or threads will be used to run the coroutine code.</li>
+</ul>
+<p>It's important to note that even though we can add multiple jobs, handlers, or dispatchers to the coroutine builder, a coroutine can only have one element of each type, so the last one always overrides all previous. For example, <code class="language-kotlin">CoroutineScope(SupervisorJob() + handler1 + handler2)</code> will use <code class="language-kotlin">handler2</code>.</p>
+<p>Another important fact is that if we don't provide an element of each type, the default one will be used. There is a default error handler and a default dispatcher for each platform; as for the job, if it's not provided, a new one will be created for us. There can't be a single default job, because each one represents its own coroutine.</p>
+<h5 id="more-about-dispatchers">More about Dispatchers</h5>
+<p>Dispatcher is just an interface and we can implement our own, if needed. In fact, most platforms (like JS, JVM/Android, Native), have their own specific dispatchers in addition to the three standard ones available everywhere.</p>
+<ul>
+<li><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html">Dispatchers.Default</a> – as the name implies, this dispatcher will be used if none is specified explicitly. It schedules coroutine execution in a background thread from a shared thread pool. It's a good choice for all types of computations that consume CPU.</li>
+<li><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html">Dispatchers.IO</a> – it uses another shared thread pool and is designed to handle I/O load with a lot of operations that can block on waiting for data. Use it for disk read/write and network requests.</li>
+<li><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-unconfined.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-unconfined.html">Dispatchers.Unconfined</a> — it starts execution of a coroutine in the current thread and runs until the first suspension; after that, it resumes in a different suitable thread. Normally, this dispatcher <strong>should not be used</strong>.</li>
+</ul>
+<p>In case we need to use our own pool of one or multiple threads, there are helper functions <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/new-single-thread-context.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/new-single-thread-context.html"><code class="language-kotlin">newSingleThreadContext()</code></a> and <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/new-fixed-thread-pool-context.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/new-fixed-thread-pool-context.html"><code class="language-kotlin">newFixedThreadPoolContext()</code></a>, which take care of creating a thread pool, and the dispatcher that uses it for execution. They may be handy if we need to run a fixed number of long-running background jobs.</p>
+<p>However, to simply limit the number of parallel threads allowed for execution, coroutines v1.6 offer a better option — <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/limited-parallelism.html" rel="noopener noreferrer nofollow" target="_blank" title="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-dispatcher/limited-parallelism.html"><code class="language-kotlin">limitedParallelism()</code></a>. This function can be applied to any multi-threaded dispatcher to guarantee that no more than N coroutines will run in parallel. For instance, <code class="language-kotlin">Dispatchers.IO.limitedParallelism(2)</code> uses the same shared IO pool but allows to use two threads only. For example, it can be useful if we are allowed to open only a limited number of DB connections. Any number of limited parallelism views can be created on top of the dispatcher.</p>
+<p>Run the following example and see what it prints:</p>
+<pre><code class="language-kotlin">fun main() {
+    runBlocking {
+        launch { // context of the parent, main runBlocking coroutine
+            println("main         : ${Thread.currentThread()}")
+        }
+        launch(Dispatchers.Unconfined) { // will work on main thread, then on another one
+            println("Unconfined A : ${Thread.currentThread()}")
+            delay(1)            // suspension point
+            println("Unconfined B : ${Thread.currentThread()}")
+        }
+        launch(Dispatchers.Default) { // will get dispatched to DefaultDispatcher
+            println("Default      : ${Thread.currentThread()}")
+        }
+        launch(newSingleThreadContext("MyThread1")) { // will get its own new thread
+            println("new thread 1 : ${Thread.currentThread()}")
+        }
+        launch(newSingleThreadContext("MyThread2")) { // will get a different new thread
+            println("new thread 2 : ${Thread.currentThread()}")
+        }
+    }
+}</code></pre>
+<h5 id="context-inheritance">Context inheritance</h5>
+<p>An important thing to know about the context is that everything except for the job is inherited by default unless explicitly overridden. That's very handy because we usually don't want to specify the same dispatcher over and over again for all children. See how that works:</p>
+<pre><code class="language-kotlin">val handler = CoroutineExceptionHandler { _, exception -&gt;
+    println("Caught ${exception.message}")
+}
+
+fun main(): Unit = runBlocking(handler) {
+    println("root              : ${this.coroutineContext}")
+    launch { // uses context of the parent, creates a new job
+        println("first             : ${this.coroutineContext}")
+
+        launch { // still same context, another new job
+            println("first-&gt;same       : ${this.coroutineContext}")
+        }
+
+        launch(Dispatchers.Default) { // overrides the dispatcher
+            println("first-&gt;default    : ${this.coroutineContext}")
+
+            launch(Dispatchers.IO) { // overrides the dispatcher once more
+                println("first-&gt;default-&gt;IO: ${this.coroutineContext}")
+            }
+        }
+    }
+}</code></pre>
+<p>It will print something like that:</p>
+<pre><code class="language-no-highlight">root              : [MainKt$special$$inlined$CoroutineExceptionHandler$1@73a8dfcc, BlockingCoroutine{Active}@1c655221, BlockingEventLoop@58d25a40]
+first             : [MainKt$special$$inlined$CoroutineExceptionHandler$1@73a8dfcc, StandaloneCoroutine{Active}@626b2d4a, BlockingEventLoop@58d25a40]
+first-&gt;same       : [MainKt$special$$inlined$CoroutineExceptionHandler$1@73a8dfcc, StandaloneCoroutine{Active}@14899482, BlockingEventLoop@58d25a40]
+first-&gt;default    : [MainKt$special$$inlined$CoroutineExceptionHandler$1@73a8dfcc, StandaloneCoroutine{Active}@1c1817d6, Dispatchers.Default]
+first-&gt;default-&gt;IO: [MainKt$special$$inlined$CoroutineExceptionHandler$1@73a8dfcc, StandaloneCoroutine{Active}@6809a6a3, Dispatchers.IO]</code></pre>
+<p>Notice how error handler once installed is inherited by all the children (even though we know it only takes effect in root); similarly, root's dispatcher called <code class="language-kotlin">BlockingEventLoop</code> propagates to all children that don't override it. And it's possible to override the same thing on different levels if necessary.</p>
+<h5 id="context-switching">Context switching</h5>
+<p>The example above shows how to run multiple concurrent jobs in different contexts, but in real life we often need something much simpler. For example, consider a UI application that needs to load some data from disk to be displayed, which can take some time and therefore can not be executed in the main thread without freezing the UI. We don't really want to launch an async job, wait for its execution, and then render the result. How can we do it in a simpler way? Kotlin offers a solution for that problem, too. It's called <code class="language-kotlin">withContext</code>. As the name implies, it executes a block of code with a new context. As shown before, it inherits the context and, if the dispatcher is specified, switches the execution to a new thread. But now the execution order is sequential. See the example:</p>
+<pre><code class="language-kotlin">fun main() = runBlocking {
+    // starts in main thread
+    println("root              : ${Thread.currentThread()} ${this.coroutineContext}")
+
+    withContext(CoroutineName("A")) { // continues in the same thread, but overrides coroutine name in context
+        println("coroutine A       : ${Thread.currentThread()} ${this.coroutineContext}")
+
+        withContext(Dispatchers.IO) { // jumps to IO thread pool
+            println("coroutine A-&gt;IO   : ${Thread.currentThread()} ${this.coroutineContext}")
+        }
+    }
+    // returns back to the main thread, after IO operation is done
+    println("root again        : ${Thread.currentThread()} ${this.coroutineContext}")
+}</code></pre>
+<p>Unlike in the previous example, the execution order is guaranteed in this case – you can prove that by adding random delays before each print and comparing the output.</p>
+<h5 id="conclusion">Conclusion</h5>
+<p>Dispatchers allow scheduling different types of work to different threads. We can use them for launching background work with <code class="language-kotlin">launch</code>/<code class="language-kotlin">async</code> builders or for moving consecutive operations between threads. All the rules of structured concurrency still apply in both cases, and the parent context is inherited in children.</p>
+</div>

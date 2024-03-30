@@ -1,0 +1,16 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: "fun doAllTheJob() {\n    println(\"Working...\")\n\n    val firstJob = GlobalScope.launch\
+    \ {\n        doLotsOfWork1() // 5 ms \n    }\n\n    val secondjob = GlobalScope.launch\
+    \ {\n        doLotsOfWork2() // 5 ms \n    }\n\n    println(\"Finishing\")\n}"
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/20887#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Sat, 23 Mar 2024 15:08:44 UTC"
+record: -1
+submission_language: kotlin

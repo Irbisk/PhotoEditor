@@ -1,0 +1,20 @@
+<h2>Please don't stop the music</h2>
+<div class="step-text">
+<p></p>
+<p>Take a look at the following snippet:</p>
+<pre><code class="language-kotlin">fun requestSongs() {
+    println("Wait a minute! We are looking for songs...")
+}
+
+suspend fun downloadMusic() {
+    println("Downloading..")
+    requestSongs()
+}
+
+fun main() {
+    downloadMusic()
+    // ...
+    println("Yay, new music")
+}</code></pre>
+<p>It should download music and wait for some external resource, but the code doesn't work properly. Choose all possible ways how we can improve it.</p>
+</div>

@@ -1,0 +1,28 @@
+type: table
+files:
+  - name: src/main/Main.kt
+    visible: true
+    text: |+
+      // You can experiment here, it won’t be checked
+    
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/13752#comment
+status: Solved
+record: -1
+rows:
+  - Finishes immediately
+  - Receives a suspending function as an argument
+  - Runs suspending code from non-suspend code
+  - Waits until the suspending code finishes
+columns:
+  - runBlocking
+  - launch
+selected:
+  - - false
+    - false
+  - - false
+    - false
+  - - false
+    - false
+  - - false
+    - false

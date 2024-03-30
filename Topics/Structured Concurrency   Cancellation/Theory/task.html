@@ -1,0 +1,77 @@
+<h2>Structured Concurrency & Cancellation</h2>
+<div class="step-text">
+<p>With coroutines we can write asynchronous operations in a regular sequential way, without the need for explicit verbose code that awaits for completion. In this respect, a few questions may arise: if many operations run asynchronously, how do we know when they all finish, or, more important, how do we know if they fail? If we start downloading a bunch of images for a gallery app but the authentication fails or the user decides to see another screen, what will happen with all the massive loading in the background? Well, we can actually control that in a nice way with structured concurrency.</p><h5 id="scopes">Scopes</h5><p>Coroutines offer <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/" rel="noopener noreferrer nofollow" target="_blank">scopes</a> to define the restrictions for running operations. Loading images for one screen should be done in one scope, for another screen — in the second scope, and an application as a whole may define its own scope, which includes both. As you can see, scopes can and often should be nested.</p><h5 id="stopping-scoped-jobs">Stopping scoped jobs</h5><p>Check out the following code, which loads images for some application: two mandatory and one that may be potentially used in the future (pre-caching).</p><pre><code class="language-kotlin">import kotlinx.coroutines.*
+
+suspend fun loadImage(name: String) {
+    delay(50) // imitate long-running operation
+    println("Loaded $name")
+}
+
+suspend fun preCache(name: String) {
+    delay(100) // imitate long-running operation
+    println("Cached $name")
+}
+
+suspend fun loadScreenInGlobalScope() {
+    GlobalScope.launch { loadImage("image_1") }
+    GlobalScope.launch { loadImage("image_2") }
+    GlobalScope.launch { preCache("image_3") }
+    throw Exception("Unexpected failure") // simulate crash in main code
+}
+
+suspend fun main() {
+    runCatching { // shortcut to ignore all exceptions with try/catch
+        loadScreenInGlobalScope()
+    }
+    delay(200) // wait long enough to see the results
+}</code></pre><p>We are launching everything in the global scope of the application, which means that launched operations will stop only when they are done or when the whole application stops. Nothing that happens after they were launched affects them. Here we simulate an error, which won't affect the loading process. This app will print (in no particular order):</p><pre><code class="language-kotlin">Loaded image_2
+
+Loaded image_1
+
+Cached image_3</code></pre><p>Let's create our own scope now with a handy builder function <code class="language-kotlin">coroutineScope</code>.</p><pre><code class="language-kotlin">suspend fun loadScreenInOwnScope(): Unit = coroutineScope {
+    launch { loadImage("image_1") }
+    launch { loadImage("image_2") }
+    launch { preCache("image_3") }
+    throw Exception("Unexpected failure") // simulate crash in scope
+}
+
+suspend fun main() {
+    runCatching { // catch all exceptions
+        loadScreenInOwnScope()
+    }
+    delay(200) // wait long enough to see the results
+}</code></pre><p>Now, it will print nothing, even with a 200ms delay at the end, because the exception inside the scope will cancel all unfinished operations. Remember that cancellation of coroutines is cooperative: they get canceled only if they actively check for cancellation or if they run suspending functions, so the compiler will do the check for us. In our case, <code class="language-kotlin">delay</code> is a suspending function that makes cancellation work as expected. If we insert a 75ms delay before the exception, we can see how <code class="language-kotlin">loadImage</code> still manages to finish while <code class="language-kotlin">preCache</code> gets stopped.</p><h5 id="manual-cancellation">Manual cancellation</h5><p>With an access to the context, we can now have even more control. It offers two methods to cancel work: <code class="language-kotlin">cancel()</code> and <code class="language-kotlin">cancelChildren()</code>. Let's see how they work. If we replace the exception in the previous example with the <code class="language-kotlin">cancel()</code> call, we'll get the same result — nothing will get printed.</p><pre><code class="language-kotlin">suspend fun loadScreenInOwnScope(): Unit = coroutineScope {
+    launch { loadImage("image_1") }
+    launch { loadImage("image_2") }
+    launch { preCache("image_3") }
+    this.coroutineContext.cancel()
+}</code></pre><p>The difference between <code class="language-kotlin">cancel()</code> and <code class="language-kotlin">cancelChildren()</code> becomes visible when there is suspended work both in the scope itself and in its children (created by the <code class="language-kotlin">launch</code> builder). The following example will only print 6 lines and won't finish loading:</p><pre><code class="language-kotlin">suspend fun doSelfCancelingJob() = coroutineScope {
+    launch { preCache("image_3") }
+    for (i in 1..10) {
+        println("Running long operation for ${i * 10}ms")
+        delay(10)
+        if (i == 5) {
+            this.coroutineContext.cancel()
+        }
+    }
+}</code></pre><p>And it's 6 lines, not 5, because of the cooperative nature of coroutines: the loop will continue after the job has been "already" canceled until the next suspending function call, which happens after <code class="language-kotlin">println</code>. Swap <code class="language-kotlin">println</code> and <code class="language-kotlin">delay</code>, and now it will stop after 5 iterations as expected.</p><p>So, if we need to stop all the background activity but don't want to break our main loop, we should replace <code class="language-kotlin">this.coroutineContext.cancel()</code> with <code class="language-kotlin">this.coroutineContext.cancelChildren()</code>. It will still stop the caching job but let the loop complete and print all 10 messages.</p><h5 id="failures-in-children">Failures in children</h5><p>What about the situation when one of the children fails with an exception but we need them all to finish to do the job? For example, if we are downloading different chunks of a large file in parallel. The scope will cancel all the work, the same way it did before. All exceptions from children are propagated up to the parent. Let's modify the example slightly:</p><pre><code class="language-kotlin">suspend fun loadImage(name: String) {
+    if (name.endsWith("2")) {
+        throw Exception("Error loading image")
+    }
+    delay(50) // imitate long-running operation
+    println("Loaded $name")
+}
+
+// ... the rest is the same
+
+suspend fun loadScreenInOwnScope(): Unit = coroutineScope {
+    launch { loadImage("image_1") }
+    launch { loadImage("image_2") }
+    launch { preCache("image_3") }
+}</code></pre><p>There is no more explicit cancellation, but the second loading operation fails. This code will also print nothing because the parent job will cancel loading of image 1 and caching image 3 immediately. That's what we want, except that we do not want to cancel everything when pre-caching fails, as it is an optional operation. How can we tell the scope to treat it differently?</p><h5 id="supervised-jobs">Supervised jobs</h5><p>To control the cancellation policy, we need to change the type of the <em>job</em> of our root function and make it <a href="https://kotlinlang.org/docs/exception-handling.html#supervision" rel="noopener noreferrer nofollow" target="_blank">supervised</a>. Each coroutine is represented by a job object. That's what the <code class="language-kotlin">launch</code> coroutine builder returns, and that's what actually gets canceled under the hood when we call <code class="language-kotlin">CoroutineScope.cancel</code>. A regular job class propagates errors both down- and up-stream in the hierarchy to cancel both children and parents. If we change it to the <code class="language-kotlin">SupervisorJob</code>, we'll say that now we are going to control cancellation manually. An error from a child job won't affect the parent anymore and consequentially won't cancel other children of that parent, while still canceling everything under the failed child. Let's look at this slightly modified example:</p><pre><code class="language-kotlin">suspend fun loadScreenInSupervisedScope() = supervisorScope {
+    val job1 = launch { loadImage("image_1") }
+    val job2 = launch { loadImage("image_2") }
+    val job3 = launch { throw Exception("Fail optional job") }
+}</code></pre><p><code class="language-kotlin">supervisorScope</code> is another scope builder, it adds <code class="language-kotlin">SupervisorJob</code> instead of a regular <code class="language-kotlin">Job</code> to the context under the hood, and now failure in <code class="language-kotlin">job3</code> won't affect <code class="language-kotlin">job1</code> and <code class="language-kotlin">job2</code> anymore (we can also manually create a scope like that for the later use with <code class="language-kotlin">CoroutineScope(SupervisorJob())</code> call).</p><h5 id="execution-status">Execution status</h5><p><a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-job/index.html" rel="noopener noreferrer nofollow" target="_blank">Job interface</a> has a lot of handy properties to check the current status of execution, start it if it's not running yet, or cancel it when it's not needed anymore. It also allows waiting for a job to finish: <code class="language-kotlin">job1.join()</code> will suspend until <code class="language-kotlin">job1</code> completes. So we can wait for non-optional tasks as follows:</p><pre><code class="language-kotlin">job1.join()
+job2.join()</code></pre><p>This code will first wait for <code class="language-kotlin">job1</code>, then for <code class="language-kotlin">job2</code>; if we want to wait for all jobs regardless of their order, there is a handy helper <code class="language-kotlin">joinAll</code>:</p><pre><code class="language-kotlin">joinAll(job1, job2)</code></pre><h5 id="conclusion">Conclusion</h5><p>With structured concurrency, we can avoid a lot of typical issues with asynchronous code, like failures in the main code when a background operation fails, or failure to cancel background work when it's not needed anymore. And <code class="language-kotlin">SupervisorJob</code> allows for precise control over what should or should not be canceled when an error occurs.</p>
+</div>

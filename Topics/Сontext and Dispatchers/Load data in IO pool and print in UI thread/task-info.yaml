@@ -1,0 +1,25 @@
+type: code
+files:
+  - name: src/main/Main.kt
+    visible: true
+    highlight_level: NONE
+    text: |-
+      fun main() = runBlocking(Dispatchers.Default) {
+          // Modify this code to make sure data loading and storing
+          // happens in Dispatchers.IO, but data printing in `UiDispatcher`
+          // which is already defined for you as a replacement for Dispatchers.Main
+          val mainJob = mainScope.launch {
+              val data = loadData()
+              printData(data)
+              storeData(data)
+          }
+          mainJob.join()
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/20508#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: "Fri, 29 Mar 2024 14:47:17 UTC"
+record: -1
+submission_language: kotlin

@@ -1,0 +1,7 @@
+<h2>Multiple dispatchers</h2>
+<div class="step-text">
+<p></p>
+<p>What will the following code print?</p>
+<pre><code class="language-kotlin">val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default + Dispatchers.IO)
+println(scope.coroutineContext[CoroutineDispatcher])</code></pre>
+</div>
