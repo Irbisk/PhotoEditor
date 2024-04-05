@@ -68,47 +68,6 @@ class MainActivity : AppCompatActivity() {
             activityResultLauncher.launch(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
         }
 
-
-/*        brightnessSlider.addOnChangeListener { _, value, _ ->
-            var bitmap = defaultImage.copy(Bitmap.Config.ARGB_8888, true)
-            bitmap = adjustBrightness(bitmap, value)
-            bitmap = adjustContrast(bitmap, contrastSlider.value)
-            bitmap = adjustSaturation(bitmap, saturationSlider.value)
-            bitmap = adjustGamma(bitmap, gammaSlider.value)
-            currentImage.setImageBitmap(bitmap)
-
-        }
-
-        contrastSlider.addOnChangeListener { _, value, _ ->
-            var bitmap = defaultImage.copy(Bitmap.Config.ARGB_8888, true)
-            bitmap = adjustBrightness(bitmap, brightnessSlider.value)
-            bitmap = adjustContrast(bitmap, value)
-            bitmap = adjustSaturation(bitmap, saturationSlider.value)
-            bitmap = adjustGamma(bitmap, gammaSlider.value)
-            currentImage.setImageBitmap(bitmap)
-
-        }
-
-        saturationSlider.addOnChangeListener { _, value, _ ->
-            var bitmap = defaultImage.copy(Bitmap.Config.ARGB_8888, true)
-            bitmap = adjustBrightness(bitmap, brightnessSlider.value)
-            bitmap = adjustContrast(bitmap, contrastSlider.value)
-            bitmap = adjustSaturation(bitmap, value)
-            bitmap = adjustGamma(bitmap, gammaSlider.value)
-            currentImage.setImageBitmap(bitmap)
-
-        }
-
-        gammaSlider.addOnChangeListener { _, value, _ ->
-            var bitmap = defaultImage.copy(Bitmap.Config.ARGB_8888, true)
-            bitmap = adjustBrightness(bitmap, brightnessSlider.value)
-            bitmap = adjustContrast(bitmap, contrastSlider.value)
-            bitmap = adjustSaturation(bitmap, saturationSlider.value)
-            bitmap = adjustGamma(bitmap, value)
-            currentImage.setImageBitmap(bitmap)
-
-        }*/
-
         brightnessSlider.addOnChangeListener { slider, value, fromUser ->
             onSliderChanges(slider, value, fromUser)
         }
