@@ -21,6 +21,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.alpha
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.material.slider.Slider
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.math.pow
 
 
@@ -43,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contrastSlider: Slider
     private lateinit var saturationSlider: Slider
     private lateinit var gammaSlider: Slider
-
+    private var lastJob: Job? = null
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,13 +68,15 @@ class MainActivity : AppCompatActivity() {
             activityResultLauncher.launch(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
         }
 
-        brightnessSlider.addOnChangeListener { _, value, _ ->
+
+/*        brightnessSlider.addOnChangeListener { _, value, _ ->
             var bitmap = defaultImage.copy(Bitmap.Config.ARGB_8888, true)
             bitmap = adjustBrightness(bitmap, value)
             bitmap = adjustContrast(bitmap, contrastSlider.value)
             bitmap = adjustSaturation(bitmap, saturationSlider.value)
             bitmap = adjustGamma(bitmap, gammaSlider.value)
             currentImage.setImageBitmap(bitmap)
+
         }
 
         contrastSlider.addOnChangeListener { _, value, _ ->
@@ -76,6 +86,7 @@ class MainActivity : AppCompatActivity() {
             bitmap = adjustSaturation(bitmap, saturationSlider.value)
             bitmap = adjustGamma(bitmap, gammaSlider.value)
             currentImage.setImageBitmap(bitmap)
+
         }
 
         saturationSlider.addOnChangeListener { _, value, _ ->
@@ -84,8 +95,8 @@ class MainActivity : AppCompatActivity() {
             bitmap = adjustContrast(bitmap, contrastSlider.value)
             bitmap = adjustSaturation(bitmap, value)
             bitmap = adjustGamma(bitmap, gammaSlider.value)
-
             currentImage.setImageBitmap(bitmap)
+
         }
 
         gammaSlider.addOnChangeListener { _, value, _ ->
@@ -95,7 +106,26 @@ class MainActivity : AppCompatActivity() {
             bitmap = adjustSaturation(bitmap, saturationSlider.value)
             bitmap = adjustGamma(bitmap, value)
             currentImage.setImageBitmap(bitmap)
+
+        }*/
+
+        brightnessSlider.addOnChangeListener { slider, value, fromUser ->
+            onSliderChanges(slider, value, fromUser)
         }
+
+        contrastSlider.addOnChangeListener { slider, value, fromUser ->
+            onSliderChanges(slider, value, fromUser)
+        }
+
+        saturationSlider.addOnChangeListener { slider, value, fromUser ->
+            onSliderChanges(slider, value, fromUser)
+        }
+
+        gammaSlider.addOnChangeListener { slider, value, fromUser ->
+            onSliderChanges(slider, value, fromUser)
+        }
+
+
 
         saveBtn.setOnClickListener { _ ->
             when {
@@ -154,6 +184,50 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun onSliderChanges(slider: Slider, sliderValue: Float, fromUser: Boolean) {
+
+        lastJob?.cancel()
+
+        lastJob = GlobalScope.launch(Dispatchers.Default) {
+
+            val bitmap = defaultImage.copy(Bitmap.Config.ARGB_8888, true) ?: return@launch
+
+            val brightenCopyDeferred: Deferred<Bitmap> = this.async {
+                if (slider == brightnessSlider) {
+                    adjustBrightness(bitmap, sliderValue)
+                } else {
+                    adjustBrightness(bitmap, brightnessSlider.value)
+                }
+
+            }
+            val brightenCopy: Bitmap = brightenCopyDeferred.await()
+
+            val contrastedCopy = if (slider == contrastSlider) {
+                adjustContrast(brightenCopy, sliderValue)
+            } else {
+                adjustContrast(brightenCopy, contrastSlider.value)
+            }
+
+            val saturatedCopy = if (slider == saturationSlider) {
+                adjustSaturation(contrastedCopy, sliderValue)
+            } else {
+                adjustSaturation(contrastedCopy, saturationSlider.value)
+            }
+
+            val gammaCopy = if (slider == gammaSlider) {
+                adjustGamma(saturatedCopy, sliderValue)
+            } else {
+                adjustGamma(saturatedCopy, gammaSlider.value)
+            }
+
+            ensureActive()
+
+            runOnUiThread {
+                currentImage.setImageBitmap(gammaCopy)
+            }
+        }
+    }
+
     private fun adjustBrightness(bitmap: Bitmap, value: Float): Bitmap {
         for (x in 0 until bitmap.width) {
             for (y in 0 until bitmap.height) {
@@ -204,7 +278,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun adjustGamma(bitmap: Bitmap, value: Float): Bitmap {
+    private  fun adjustGamma(bitmap: Bitmap, value: Float): Bitmap {
         for (x in 0 until bitmap.width) {
             for (y in 0 until bitmap.height) {
                 val pixel = bitmap.getPixel(x, y)
